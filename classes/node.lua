@@ -128,9 +128,9 @@ function Node:insertBefore(newChild, refChild)
             node.parentNode = self
             self.ownerDocument = node.ownerDocument
 
-            self.childNodes:insert
         end
     end
+end
 
 function Node:cloneNode(deep)
     if deep then
