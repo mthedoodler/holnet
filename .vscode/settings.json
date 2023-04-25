@@ -1,6 +1,12 @@
 {
     "Lua.diagnostics.globals": [
         "textutils",
-        "textutils"
+        "textutils",
+        "term",
+        "colors",
+        "fs"
+    ],
+    "Lua.diagnostics.disable": [
+        "undefined-doc-param"
     ]
 }

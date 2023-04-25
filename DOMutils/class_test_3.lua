@@ -1,5 +1,5 @@
-unittests = require("unittests")
-classutils = require("classutils")
+local unittests = require("unittests")
+local classutils = require("classutils")
 
 local type = classutils.type
 local instanceof = classutils.instanceof
@@ -57,8 +57,8 @@ function Canid.new(public1, private1)
     return o
 end
 
-animal = Animal.new(-5, 10)
-canid = Canid.new(7, 30)
+local animal = Animal.new(-5, 10)
+local canid = Canid.new(7, 30)
 
 tester.startTests("Expect Function")
 tester.ensureRuns(function() expectSingle(1, 1, "number") end, "Expecting number works with number.")

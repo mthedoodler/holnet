@@ -1,21 +1,21 @@
 local expect = require "cc.expect"
-local expect, field = expect.expect, expect.field
+expect = expect.expect
 
 --- A logger is an object with methods for logging messages to a file and the console.
 --- This function creates a new logger object.
---- @param[string] file - The filepath to the file the logger write logs to.
---- @return[table] logger - A table containing logging functions.
+--- @param filepath string - The filepath to the file the logger write logs to.
+--- @return table - A table containing logging functions.
 
-function Logger(file)
-    expect(1, file, "string")
+function Logger(filepath)
+    expect(1, filepath, "string")
     local logger = {silent = false}
 
     local LOG = fs.open("log.txt", "w")
     LOG.close()
 
     --- Log a message with a set text color.
-    --- @param[string] str - The message to log.
-    --- @param[number] color - The color to print to the screen.
+    --- @param str string - The message to log.
+    --- @param color number - The color to print to the screen.
 
     local function log(str, color)
         expect(1, str, "string")
@@ -31,21 +31,21 @@ function Logger(file)
     end
 
     --- Log a message with a yellow text color.
-    --- @param[string] str - The message to log.
+    --- @param str string - The message to log.
 
     function logger.log(str)
         log(str, colors.yellow)
     end
 
     --- Log a success message with a lime text color.
-    --- @param[string] str - The message to log.
+    --- @param str string - The message to log.
 
     function logger.logsuccess(str) 
         log(str, colors.lime)
     end
 
     --- Log an error message with a red text color.
-    --- @param[string] str - The message to log.
+    --- @param str string - The message to log.
 
     function logger.logerr(str)
         log(str, colors.red)
@@ -58,8 +58,8 @@ end
 --- It first runs and prints every test it encounters, and when endTests is called, it
 --- shows which ones passed and failed.
 --- This function creates a new tester object.
---- @param[table] logger - The logger to use.
---- @return[table] tester - A table containing logging functions.
+--- @param logger table - The logger to use.
+--- @return table - A table containing logging functions.
 
 function Tester(logger)
     expect(1, logger, "table")
@@ -71,7 +71,8 @@ function Tester(logger)
     local runningTests = false
 
     --- Restarts the tests and logs an initial statement.
-    --- @param[string] name - The name of the tests to preform.
+    --- @param name string - The name of the group of tests to preform.
+    --- @param isSilent boolean - Whether or to print tests to the screen when testing.
 
     function tester.startTests(name, isSilent)
         
@@ -84,8 +85,8 @@ function Tester(logger)
     end
 
     --- Passes if the given function runs without errors.
-    --- @param[function] func - The function to test.
-    --- @param[string] description - The summary of the test to preform.
+    --- @param func function - The function to test.
+    --- @param description string - The summary of the test to preform.
 
     function tester.ensureRuns(func, description)
         if not runningTests then error("Please call tester.startTests() before preforming them.") end
@@ -103,8 +104,8 @@ function Tester(logger)
     end
 
     --- Passes if the given function throws an error.
-    --- @param[function] func - The function to test.
-    --- @param[string] description - The summary of the test to preform.
+    --- @param func function - The function to test.
+    --- @param description string - The summary of the test to preform.
 
     function tester.ensureErrors(func, description)
         if not runningTests then error("Please call tester.startTests() before preforming them.") end
@@ -122,9 +123,9 @@ function Tester(logger)
     end
 
     --- Passes if the given function returns an expected value.
-    --- @param[function] func - The function to evaluate.
-    --- @param[any] expected - The expected value func returns.
-    --- @param[string] description - The summary of the test to preform.
+    --- @param func function - The function to evaluate.
+    --- @param description string - The summary of the test to preform.
+    --- @param expected any - The value func is expected to return.
 
     function tester.ensureEquals(func, description, expected)
         if not runningTests then error("Please call tester.startTests() before preforming them.") end

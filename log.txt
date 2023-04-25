@@ -27,10 +27,10 @@ DOMutils/class_test_3.lua:77: bad argument #1 (expected table, got number)
 Running Test 11: Expecting class works.
 -- [Test 11 Passed!] --
 Running Test 12: Expecting class fails when instance.
-DOMutils/classutils.lua:90: bad argument #1 (expected class, got Animal)
+DOMutils/classutils.lua:91: bad argument #1 (expected class, got Animal)
 -- [Test 12 Passed!] --
 Running Test 13: Expecting class fails when non-class table.
-DOMutils/classutils.lua:90: bad argument #1 (expected class, got table)
+DOMutils/classutils.lua:91: bad argument #1 (expected class, got table)
 -- [Test 13 Passed!] --
 Running Test 14: Expecting class fails when not class or table.
 DOMutils/class_test_3.lua:82: bad argument #1 (expected class, got string)
@@ -38,12 +38,12 @@ DOMutils/class_test_3.lua:82: bad argument #1 (expected class, got string)
 Running Test 15: Expecting subclass class works.
 -- [Test 15 Passed!] --
 Running Test 16: Expecting subclass fails when instance.
-DOMutils/classutils.lua:90: bad argument #1 (expected class, got Canid)
+DOMutils/classutils.lua:91: bad argument #1 (expected class, got Canid)
 -- [Test 16 Passed!] --
 Running Test 17: Expecting subclassclass works when subclass.
 -- [Test 17 Passed!] --
 Running Test 18: Expecting parent class fails when instance.
-DOMutils/classutils.lua:99: bad argument 1(expected Canid, got Animal)
+DOMutils/classutils.lua:100: bad argument 1(expected Canid, got Animal)
 -- [Test 18 Passed!] --
 Running Test 19: Expecting subclass when superclass - Polymorphism
 -- [Test 19 Passed!] --
@@ -131,16 +131,16 @@ Running Test 8: Ensure reading new readonly property via _ works.
 -->Expected: -6,  Recieved: -6
 -- [Test 8 Passed!] --
 Running Test 9: Ensure setting new read only property fails
-DOMutils/classutils.lua:211: Attempt to set read-only variable readonly3
+DOMutils/classutils.lua:212: Attempt to set read-only variable readonly3
 -- [Test 9 Passed!] --
 Running Test 10: Ensure setting inherited read only property fails
-DOMutils/classutils.lua:211: Attempt to set read-only variable readonly2
+DOMutils/classutils.lua:212: Attempt to set read-only variable readonly2
 -- [Test 10 Passed!] --
 Running Test 11: Ensure reading new private property fails.
 DOMutils/class_test_3.lua:126: Attempt to access private variable private3
 -- [Test 11 Passed!] --
 Running Test 12: Ensure reading inherited property fails.
-DOMutils/classutils.lua:166: Attempt to access private variable private2
+DOMutils/classutils.lua:167: Attempt to access private variable private2
 -- [Test 12 Passed!] --
 Running Test 13: Ensure reading new private property via _ works.
 -->Expected: "Fuck you",  Recieved: "Fuck you"

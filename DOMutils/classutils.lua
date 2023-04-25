@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-doc-name
 
 ---Utilities for creating simple classes.
 
@@ -14,15 +15,15 @@
 ---TODO: Add support for getters.
 
 local expect = require "cc.expect"
-local expect, field = expect.expect, expect.field
+expect = expect.expect
 
 local rawtype = type
 local rawexpect = expect
 
 --- New type function that adds class type support.
 --- 
---- @param[any] - The object whose type to find.
---- @return[string] - The type of the object.
+--- @param obj any - The object whose type to find.
+--- @return string - The type of the object.
 
 local function type(obj)
     local currentType = rawtype(obj)
@@ -40,9 +41,9 @@ end
 
 --- Checks if an object is an instance of a class or its superclasses.
 --- 
---- @param[any] obj - The object to check.
---- @param[any] class - The class to check against.
---- @return[boolean] true if obj is an instance of class, false otherwise.
+--- @param obj any - The object to check.
+--- @param class class - The class to check against.
+--- @return boolean - true if obj is an instance of class, false otherwise.
 
 local function instanceof(obj, class)
     expect(1, obj, "table")
@@ -69,10 +70,10 @@ end
 --- For tables, it checks to see if it's a class or an instance.
 --- If value doesnt match expectedType, throws an error. Otherwise, returns value.
 --- 
---- @param[number] index - The 1-based argument index.
---- @param[any] var - The argument value.
---- @param[string | class] - The type to check against.
---- @return[any] var - Returns the value itself.
+--- @param index number - The 1-based argument index.
+--- @param var any - The argument value.
+--- @param expectedType string | class - The type to check against.
+--- @return var any - Returns the value itself.
 
 local function expectSingle(index, var, expectedType)
     rawexpect(1, index, "number")
@@ -101,8 +102,8 @@ end
 
 --- Check if the class cls implements all of its parent class's methods.
 
---- @param[table] cls - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
----
+--- @param cls class - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
+
 local function ensureImplementsAbstract(cls)
     expectSingle(1, cls, "class")
     local parent = getmetatable(cls)
@@ -115,10 +116,10 @@ local function ensureImplementsAbstract(cls)
 end
 
 --- Create a new base class given its name(type) and variables.
-    
---- @param[string] name - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
---- @param[table] vars - The properties(instance variables) that the class stores, along with default values.
---- @return[class] cls - The new class table.
+
+--- @param name string - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
+--- @param vars table - The properties(instance variables) that the class stores, along with default values.
+--- @return cls class - The new class table.
 
 local function class(name, vars)
     --Enforce typing. 
@@ -189,10 +190,10 @@ end
 
 --- Extend a base class given the class table and its new name and vars.
     
---- @param[table] super - The superclass table. This will be the parent of cls.
---- @param[string] name - The namme of the new subclass. This is stored in the cls.__type private property will be what type(cls) returns.
---- @param[table] vars - The properties(instance variables) that the subclass stores, along with default values.
---- @return[table] cls - The new subclass table.
+--- @param super table - The superclass table. This will be the parent of cls.
+--- @param name string - The namme of the new subclass. This is stored in the cls.__type private property will be what type(cls) returns.
+--- @param vars table - The properties(instance variables) that the subclass stores, along with default values.
+--- @return class - The new subclass table.
 
 local function extend(super, name, vars) 
     expectSingle(1, super, "class")
