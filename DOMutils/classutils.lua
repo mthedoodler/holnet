@@ -38,24 +38,6 @@ local function type(obj)
     return "table"
 end
 
-
-local function expect(index, var, varType)
-    rawexpect(1, index, "number")
-    rawexpect(2, var, "number")
-    local currentType = type(var)
-
-    if currentType ~= "table" then
-        rawexpect(index, var, varType)
-    end
-
-    if (var.__type == nil) then
-        rawexpect(index, var, "table")
-    end
-
-    if (vare) then
-        error("bad argument #"..index  ,2)
-    end
-end
 --- Checks if an object is an instance of a class or its superclasses.
 --- 
 --- @param[any] obj - The object to check.
@@ -79,6 +61,31 @@ local function instanceof(obj, class)
     end
 
     return instanceof(obj_mt, class)
+end
+
+
+local function expect(index, var, varType)
+    rawexpect(1, index, "number")
+
+    local currentType = type(var)
+
+    if currentType ~= "table" then
+        return rawexpect(index, var, varType)
+    end
+
+    if (var.__type == nil) then
+        return rawexpect(index, var, "table")
+    end
+
+    if varType == "class" then
+        return var
+    end
+
+    if not instanceof(var, varType) then
+        error("bad argument #" .. index .. " to 'expect' (expected " .. varType .. ", got " .. type(var) .. ")")
+    end
+
+    return var
 end
 
 --- Check if the class cls implements all of its parent class's methods.
@@ -185,4 +192,4 @@ local function extend(super, name, vars)
 end
 
 
-return {type=type, rawtype=rawtype, instanceof=instanceof, class=class, extend=extend}
+return {type=type, expect=expect, rawtype=rawtype, instanceof=instanceof, class=class, extend=extend}

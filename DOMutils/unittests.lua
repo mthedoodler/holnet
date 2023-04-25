@@ -68,6 +68,7 @@ function Tester(logger)
     local testResults = {}
     local tester = {}
     local testName = ""
+    local runningTests = false
 
     --- Restarts the tests and logs an initial statement.
     --- @param[string] name - The name of the tests to preform.
@@ -79,6 +80,7 @@ function Tester(logger)
         tester = {}
         testName = name
         logger.log("**** BEGIN TEST: " .. testName .. "****")
+        runningTests = true
     end
 
     --- Passes if the given function runs without errors.
@@ -86,6 +88,7 @@ function Tester(logger)
     --- @param[string] description - The summary of the test to preform.
 
     function tester.ensureRuns(func, description)
+        if not runningTests then error("Please call tester.startTests() before preforming them.") end
         logger.log("Running Test " .. testCounter .. ": " .. description)
         local res, err = pcall(func)
         if res then
@@ -104,6 +107,7 @@ function Tester(logger)
     --- @param[string] description - The summary of the test to preform.
 
     function tester.ensureErrors(func, description)
+        if not runningTests then error("Please call tester.startTests() before preforming them.") end
         logger.log("Running Test " .. testCounter .. ": " .. description)
         local res, err = pcall(func)
         if res then
@@ -123,6 +127,7 @@ function Tester(logger)
     --- @param[string] description - The summary of the test to preform.
 
     function tester.ensureEquals(func, description, expected)
+        if not runningTests then error("Please call tester.startTests() before preforming them.") end
         logger.log("Running Test " .. testCounter .. ": " .. description)
         local val = func()
         local res = val == expected
@@ -162,6 +167,8 @@ function Tester(logger)
         testCounter = 1
 
         logger.log("**** END TEST: " .. testName .. "****\n")
+
+        runningTests = false
     end
 
     return tester

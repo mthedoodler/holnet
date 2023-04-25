@@ -1,3 +1,28 @@
+**** BEGIN TEST: Expect Function****
+Running Test 1: Expecting number works with number.
+Test 1 Passed!
+Running Test 2: Expecting number fails with not a number.
+DOMutils/class_test_3.lua:16: bad argument #1 (expected number, got string)
+Test 2 Passed!
+Running Test 3: Expecting string works.
+Test 3 Passed!
+Running Test 4: Expecting boolean works.
+Test 4 Passed!
+Running Test 5: Expecting function works.
+Test 5 Passed!
+Running Test 6: Expecting table works.
+Test 6 Passed!
+**** TEST RESULTS: ****
+Tests 1-6 Concluded.
+Test 1 Passed!
+Test 2 Passed!
+Test 3 Passed!
+Test 4 Passed!
+Test 5 Passed!
+Test 6 Passed!
+6 Passed, 0 Failed.
+**** END TEST: Expect Function****
+
 **** BEGIN TEST: Base Class + Encapsulation****
 Running Test 1: Ensure reading public properties works.
 Expected: -5,  Recieved: -5
@@ -12,10 +37,10 @@ Running Test 4: Ensure reading readonly via _readonly works
 Expected: 5,  Recieved: 5
 Test 4 Passed!
 Running Test 5: Ensure read-only variables can't be set.
-DOMutils/class_test_3.lua:59: Attempt to set read-only variable readonly
+DOMutils/class_test_3.lua:71: Attempt to set read-only variable readonly
 Test 5 Passed!
 Running Test 6: Ensure private variables can't be read.
-DOMutils/class_test_3.lua:61: Attempt to access private variable private
+DOMutils/class_test_3.lua:73: Attempt to access private variable private
 Test 6 Passed!
 Running Test 7: Ensure private variable accessable by __.
 Expected: 10,  Recieved: 10
@@ -58,16 +83,16 @@ Running Test 8: Ensure reading new readonly property via _ works.
 Expected: -6,  Recieved: -6
 Test 8 Passed!
 Running Test 9: Ensure setting new read only property fails
-DOMutils/classutils.lua:174: Attempt to set read-only variable readonly3
+DOMutils/classutils.lua:185: Attempt to set read-only variable readonly3
 Test 9 Passed!
 Running Test 10: Ensure setting inherited read only property fails
-DOMutils/classutils.lua:174: Attempt to set read-only variable readonly2
+DOMutils/classutils.lua:185: Attempt to set read-only variable readonly2
 Test 10 Passed!
 Running Test 11: Ensure reading new private property fails.
-DOMutils/class_test_3.lua:86: Attempt to access private variable private3
+DOMutils/class_test_3.lua:98: Attempt to access private variable private3
 Test 11 Passed!
 Running Test 12: Ensure reading inherited property fails.
-DOMutils/classutils.lua:133: Attempt to access private variable private2
+DOMutils/classutils.lua:144: Attempt to access private variable private2
 Test 12 Passed!
 Running Test 13: Ensure reading new private property via _ works.
 Expected: "Fuck you",  Recieved: "Fuck you"

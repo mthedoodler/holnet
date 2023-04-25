@@ -5,6 +5,28 @@ local type = classutils.type
 local instanceof = classutils.instanceof
 local class = classutils.class
 local extend = classutils.extend
+local expect = classutils.expect
+
+local logger = unittests.Logger("log.txt")
+logger.silent = false
+local tester = unittests.Tester(logger)
+
+tester.startTests("Expect Function")
+tester.ensureRuns(function() expect(1, 1, "number") end, "Expecting number works with number.")
+tester.ensureErrors(function() expect(1, "NotANumber", "number") end, "Expecting number fails when not a number.")
+
+tester.ensureRuns(function() expect(1, "1", "string") end, "Expecting string works.")
+tester.ensureErrors(function() expect(1, 6, "string") end, "Expecting string fails when not a string.")
+
+tester.ensureRuns(function() expect(1, false, "boolean") end, "Expecting boolean works.")
+tester.ensureErrors(function() expect(1, "NotABool", "boolean") end, "Expecting boolean fails when not a string.")
+
+tester.ensureRuns(function() expect(1, tester.ensureRuns, "function") end, "Expecting function works.")
+tester.ensureRuns(function() expect(1, "NotAFunc", "Expecting function fails when not a function"))
+
+tester.ensureRuns(function() expect(1, {}, "table") end, "Expecting table works.")
+
+tester.endTests()
 
 Animal = {
     public = 1,
@@ -43,10 +65,6 @@ function Canid.new(public1, private1)
 end
 
 animal = Animal.new(-5, 10)
-
-local logger = unittests.Logger("log.txt")
-logger.silent = false
-local tester = unittests.Tester(logger)
 
 tester.startTests("Base Class + Encapsulation")
 
@@ -123,6 +141,3 @@ tester.endTests()
 
 
 print(Canid.new)
-local expect = require "cc.expect"
-local expect, field = expect.expect, expect.field
-expect(1, canid, "Canid")
