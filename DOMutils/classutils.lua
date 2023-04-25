@@ -64,28 +64,39 @@ local function instanceof(obj, class)
 end
 
 
-local function expect(index, var, varType)
+--- Adds support for classes to cc.expect's expect function. Only supports 1 valid type.
+--- For non table Lua types, this just calls cc.expect's version.
+--- For tables, it checks to see if it's a class or an instance.
+--- If value doesnt match expectedType, throws an error. Otherwise, returns value.
+--- 
+--- @param[number] index - The 1-based argument index.
+--- @param[any] var - The argument value.
+--- @param[string | class] - The type to check against.
+--- @return[any] var - Returns the value itself.
+
+local function expectSingle(index, var, expectedType)
     rawexpect(1, index, "number")
+    rawexpect(3, expectedType, "string", "table")
 
-    local currentType = type(var)
+    if rawtype(expectedType) ~= "table" then --Are we testing for a default builtin or a class?
+        if rawtype(var) ~= "table" or (expectedType == "table" and type(var) == "table") then --Is the variable a table(and not an instance)?
+            return rawexpect(index, var, expectedType)
+        end
 
-    if currentType ~= "table" then
-        return rawexpect(index, var, varType)
+        --If testing for a class, return the variable if the metatable(parent) has a __type.
+        if expectedType == "class" and rawget(var, "__type") then
+            return var
+        else
+            error("bad argument #"..index.." (expected "..expectedType .. ", got "..type(var) ..")")
+        end
     end
 
-    if (var.__type == nil) then
-        return rawexpect(index, var, "table")
-    end
-
-    if varType == "class" then
+    --Otherwise, we're expecting a class/subtype of the class.
+    if var:instanceof(expectedType) then
         return var
     end
 
-    if not instanceof(var, varType) then
-        error("bad argument #" .. index .. " to 'expect' (expected " .. varType .. ", got " .. type(var) .. ")")
-    end
-
-    return var
+    error("bad argument " .. index .. "(expected ".. expectedType.__type .. ", got ".. var.__type ..")")
 end
 
 --- Check if the class cls implements all of its parent class's methods.
@@ -93,7 +104,7 @@ end
 --- @param[table] cls - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
 ---
 local function ensureImplementsAbstract(cls)
-
+    expectSingle(1, cls, "class")
     local parent = getmetatable(cls)
 
     for key, value in pairs(cls) do
@@ -107,7 +118,8 @@ end
     
 --- @param[string] name - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
 --- @param[table] vars - The properties(instance variables) that the class stores, along with default values.
----
+--- @return[class] cls - The new class table.
+
 local function class(name, vars)
     --Enforce typing. 
     expect(1, name, "string")
@@ -124,12 +136,20 @@ local function class(name, vars)
     -- Identify private and read-only variables defined in the `vars` parameter.
     local clsPrivateVars = {}
     local clsReadOnlyVars = {}
+    local clsGetters = {}
+    local clsSetters = {}
+
     for key, _ in pairs(cls) do
         if key:sub(1,1) == "_" then
             if key:sub(2,2) == "_" then
                 clsPrivateVars[key:sub(3,-1)] = true
             else
                 clsReadOnlyVars[key:sub(2,-1)] = true
+                if key:sub(2,2) == "g" then
+                    clsGetters[key:sub(3,-1)] = true
+                elseif key:sub(2,2) == "s" then
+                    clsSetters[key:sub(3,-1)] = true
+                end
             end
         end
     end
@@ -140,13 +160,17 @@ local function class(name, vars)
             error("Attempt to access private variable " .. key, 2)
         elseif clsReadOnlyVars[key] then
             return tbl["_" .. key]
+        elseif clsGetters[key] then
+            return cls["_g" .. key](tbl)
         else
             return cls[key]
         end
     end
 
     function cls.__newindex(tbl, key, value)
-        if clsReadOnlyVars[key] then
+        if clsSetters[key] then
+            cls["_s" .. key](tbl, value)
+        elseif clsReadOnlyVars[key] then
             error("Attempt to set read-only variable " .. key, 2)
         else
             rawset(tbl, key, value)
@@ -159,7 +183,7 @@ local function class(name, vars)
     end
 
     -- Return the new class table, along with tables of its private and read-only variables.
-    return cls, clsReadOnlyVars
+    return cls, clsReadOnlyVars, clsSetters
 end
 
 
@@ -171,17 +195,19 @@ end
 --- @return[table] cls - The new subclass table.
 
 local function extend(super, name, vars) 
-    expect(1, super, "table")
+    expectSingle(1, super, "class")
     expect(2, name, "string")
-    expect(3, vars, "table")
+    expectSingle(3, vars, "table")
 
     --Create class and set metatable to the parent.
-    local cls, clsReadOnlyVars = class(name, vars)
+    local cls, clsReadOnlyVars, clsSetters = class(name, vars)
     setmetatable(cls, super)
 
     --Override the __newindex method so it looks at the metatable if it can't find it in the object.
     function cls.__newindex(tbl, key, value)
-        if clsReadOnlyVars[key] then
+        if clsSetters[key] then
+            cls["_s" .. key](tbl, value)
+        elseif clsReadOnlyVars[key] then
             error("Attempt to set read-only variable " .. key)
         else
             getmetatable(cls).__newindex(tbl, key, value)
@@ -192,4 +218,4 @@ local function extend(super, name, vars)
 end
 
 
-return {type=type, expect=expect, rawtype=rawtype, instanceof=instanceof, class=class, extend=extend}
+return {type=type, expectSingle=expectSingle, rawtype=rawtype, instanceof=instanceof, class=class, extend=extend}

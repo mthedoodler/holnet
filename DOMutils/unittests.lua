@@ -54,12 +54,12 @@ function Logger(file)
     return logger
 end
 
--- A tester is an object with methods for preforming unit tests.
--- It first runs and prints every test it encounters, and when endTests is called, it
--- shows which ones passed and failed.
--- This function creates a new tester object.
--- @param[table] logger - The logger to use.
--- @return[table] tester - A table containing logging functions.
+--- A tester is an object with methods for preforming unit tests.
+--- It first runs and prints every test it encounters, and when endTests is called, it
+--- shows which ones passed and failed.
+--- This function creates a new tester object.
+--- @param[table] logger - The logger to use.
+--- @return[table] tester - A table containing logging functions.
 
 function Tester(logger)
     expect(1, logger, "table")
@@ -92,10 +92,10 @@ function Tester(logger)
         logger.log("Running Test " .. testCounter .. ": " .. description)
         local res, err = pcall(func)
         if res then
-            logger.logsuccess("Test " .. testCounter .. " Passed!")
+            logger.logsuccess("-- [Test " .. testCounter .. " Passed!] --")
         else
             logger.logerr(err)
-            logger.logerr("Test " .. testCounter .. " Failed")
+            logger.logerr("-- [Test " .. testCounter .. " Failed] --")
         end
 
         testResults[testCounter] = {description=description, res=res}
@@ -111,10 +111,10 @@ function Tester(logger)
         logger.log("Running Test " .. testCounter .. ": " .. description)
         local res, err = pcall(func)
         if res then
-            logger.logerr("Test " .. testCounter .. " Failed")
+            logger.logerr("-- [Test " .. testCounter .. " Failed!] --")
         else
             logger.log(err)
-            logger.logsuccess("Test " .. testCounter .. " Passed!")
+            logger.logsuccess("-- [Test " .. testCounter .. " Passed!] --")
         end
 
         testResults[testCounter] = {description=description, res=not res}
@@ -132,11 +132,11 @@ function Tester(logger)
         local val = func()
         local res = val == expected
         if res then
-            logger.log("Expected: " .. textutils.serialize(expected) .. ",  Recieved: " .. textutils.serialize(val))
-            logger.logsuccess("Test " .. testCounter .. " Passed!")
+            logger.log("-->Expected: " .. textutils.serialize(expected) .. ",  Recieved: " .. textutils.serialize(val))
+            logger.logsuccess("-- [Test " .. testCounter .. " Passed!] --")
         else
-            logger.logerr("Expected: " .. textutils.serialize(expected) .. ",  Recieved: " .. textutils.serialize(val))
-            logger.logerr("Test " .. testCounter .. " Failed")
+            logger.logerr("-->Expected: " .. textutils.serialize(expected) .. ",  Recieved: " .. textutils.serialize(val))
+            logger.logerr("-- [Test " .. testCounter .. " Failed] --")
         end
 
         testResults[testCounter] = {description=description, res=res}
