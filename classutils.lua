@@ -96,7 +96,6 @@ local function class(name, vars)
 
     -- Make `__newindex` and `__index` functions that enforce read-only and private variables.
     function cls.__index(tbl, key)
-        print(key)
         if clsPrivateVars[key] then
             error("Attempt to access private variable " .. key)
         elseif clsReadOnlyVars[key] then

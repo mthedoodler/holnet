@@ -1,8 +1,6 @@
 unittests = require("unittests")
-local logger = unittests.Logger("log.txt")
-local tester = unittests.Tester(logger)
-
 classutils = require("classutils")
+
 local type = classutils.type
 local instanceof = classutils.instanceof
 local class = classutils.class
@@ -47,6 +45,11 @@ end
 
 animal = Animal.new(-5, 10)
 
+local logger = unittests.Logger("log.txt")
+logger.silent = true
+local tester = unittests.Tester(logger)
+
+tester.startTests("Base Class + Encapsulation")
 
 --Test Basic Classes Methods
 tester.ensureEquals(function() return animal.public end, "Ensure reading public properties works.", -5)
@@ -58,6 +61,10 @@ tester.ensureErrors(function() animal.readonly = 2 end, "Ensure read-only variab
 
 tester.ensureErrors(function() return animal.private end, "Ensure private variables can't be read.")
 tester.ensureEquals(function() return animal.__private end, "Ensure private variable accessable by __.", 10)
+
+tester.endTests()
+
+tester.startTests("Interhitance + Encapsulation")
 
 --Test inheritance
 canid = Canid.new(7, 30)
