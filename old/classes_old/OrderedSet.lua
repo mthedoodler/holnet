@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global, undefined-global
 --OrderedSet as specified in DOM level 1
 
 require("utils")

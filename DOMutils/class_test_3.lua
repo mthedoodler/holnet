@@ -5,7 +5,8 @@ local type = classutils.type
 local instanceof = classutils.instanceof
 local class = classutils.class
 local extend = classutils.extend
-local expectSingle = classutils.expectSingle
+local expect = classutils.expect
+local assertImplementsParent = classutils.assertImplementsParent
 
 local logger = unittests.Logger("log.txt")
 logger.silent = true
@@ -43,7 +44,9 @@ Canid = {
     public3 = 1,
     __private3 = "Fuck you",
     _readonly2 = 5,
-    _readonly3 = -6
+    _readonly3 = -6,
+    _ggetter2 = true,
+    _ssetter2 = true
 }
 
 Canid = extend(Animal, "Canid", Canid)
@@ -57,36 +60,51 @@ function Canid.new(public1, private1)
     return o
 end
 
+function Canid:_ggetter2()
+    return 3
+end
+
+function Canid:_ssetter2(val)
+    self.setValue2 = val
+end
+
 local animal = Animal.new(-5, 10)
 local canid = Canid.new(7, 30)
 
 tester.startTests("Expect Function")
-tester.ensureRuns(function() expectSingle(1, 1, "number") end, "Expecting number works with number.")
-tester.ensureErrors(function() expectSingle(1, "NotANumber", "number") end, "Expecting number fails when not a number.")
+tester.ensureRuns(function() expect(1, 1, "number") end, "Expecting number works with number.")
+tester.ensureErrors(function() expect(1, "NotANumber", "number") end, "Expecting number fails when not a number.")
 
-tester.ensureRuns(function() expectSingle(1, "1", "string") end, "Expecting string works.")
-tester.ensureErrors(function() expectSingle(1, 6, "string") end, "Expecting string fails when not a string.")
+tester.ensureRuns(function() expect(1, "1", "string") end, "Expecting string works.")
+tester.ensureErrors(function() expect(1, 6, "string") end, "Expecting string fails when not a string.")
 
-tester.ensureRuns(function() expectSingle(1, false, "boolean") end, "Expecting boolean works.")
-tester.ensureErrors(function() expectSingle(1, "NotABool", "boolean") end, "Expecting boolean fails when not a string.")
+tester.ensureRuns(function() expect(1, false, "boolean") end, "Expecting boolean works.")
+tester.ensureErrors(function() expect(1, "NotABool", "boolean") end, "Expecting boolean fails when not a string.")
 
-tester.ensureRuns(function() expectSingle(1, tester.ensureRuns, "function") end, "Expecting function works.")
-tester.ensureErrors(function() expectSingle(1, "NotAFunc", "function") end, "Expecting function fails when not a function")
+tester.ensureRuns(function() expect(1, tester.ensureRuns, "function") end, "Expecting function works.")
+tester.ensureErrors(function() expect(1, "NotAFunc", "function") end, "Expecting function fails when not a function")
 
-tester.ensureRuns(function() expectSingle(1, {}, "table") end, "Expecting table works.")
-tester.ensureErrors(function() expectSingle(1, 2, "table") end, "Expecting table fails when not table.")
+tester.ensureRuns(function() expect(1, {}, "table") end, "Expecting table works.")
+tester.ensureErrors(function() expect(1, 2, "table") end, "Expecting table fails when not table.")
 
-tester.ensureRuns(function() expectSingle(1, Animal, "class") end, "Expecting class works.")
-tester.ensureErrors(function() expectSingle(1, animal, "class") end, "Expecting class fails when instance.")
-tester.ensureErrors(function() expectSingle(1, {}, "class") end, "Expecting class fails when non-class table.")
-tester.ensureErrors(function() expectSingle(1, "Animal", "class") end, "Expecting class fails when not class or table.")
+tester.ensureRuns(function() expect(1, Animal, "class") end, "Expecting class works.")
+tester.ensureRuns(function() expect(1, Animal, "class", "string") end, "Expecting class multiple types works.")
+tester.ensureErrors(function() expect(1, animal, "class") end, "Expecting class fails when instance.")
+tester.ensureErrors(function() expect(1, animal, "class", "string") end, "Expecting class fails when instance multiple arguments.")
 
-tester.ensureRuns(function() expectSingle(1, Canid, "class") end, "Expecting subclass class works.")
-tester.ensureErrors(function() expectSingle(1, canid, "class") end, "Expecting subclass fails when instance.")
-tester.ensureRuns(function() expectSingle(1, canid, Canid) end, "Expecting subclassclass works when subclass.")
+tester.ensureErrors(function() expect(1, {}, "class") end, "Expecting class fails when non-class table.")
+tester.ensureErrors(function() expect(1, "Animal", "class") end, "Expecting class fails when not class or table.")
 
-tester.ensureErrors(function() expectSingle(1, animal, Canid) end, "Expecting parent class fails when instance.")
-tester.ensureRuns(function() expectSingle(1, canid, Animal) end, "Expecting subclass when superclass - Polymorphism")
+tester.ensureRuns(function() expect(1, Canid, "class") end, "Expecting subclass class works.")
+tester.ensureErrors(function() expect(1, canid, "class") end, "Expecting subclass fails when instance.")
+tester.ensureRuns(function() expect(1, canid, Canid) end, "Expecting subclassclass works when subclass.")
+
+tester.ensureErrors(function() expect(1, animal, Canid) end, "Expecting parent class fails when instance.")
+tester.ensureRuns(function() expect(1, canid, Animal) end, "Expecting subclass when superclass - Polymorphism")
+tester.ensureErrors(function() expect(1, Canid, Animal) end, "Expecting subclass when superclass fails when class is passed - Class is not instance.")
+tester.ensureErrors(function() expect(1, Canid, Animal, "number", "string") end, "Expecting subclass when superclass fails when class is passed - Class is not instance.")
+
+
 tester.endTests()
 
 tester.startTests("Base Class + Encapsulation")
@@ -130,10 +148,10 @@ tester.ensureEquals(function() return canid.__private2 end, "Ensure reading inhe
 
 --Test new type function
 tester.ensureEquals(function() return type(animal) end, "Ensure Type works on base instance.", "Animal")
-tester.ensureEquals(function() return type(Animal) end, "Ensure Type works on base class.", "Animal")
+tester.ensureEquals(function() return type(Animal) end, "Ensure Type works on base class.", "class")
 
 tester.ensureEquals(function() return type(canid) end, "Ensure Type works on base instance.", "Canid")
-tester.ensureEquals(function() return type(Canid) end, "Ensure Type works on base class.", "Canid")
+tester.ensureEquals(function() return type(Canid) end, "Ensure Type works on base class.", "class")
 
 --Test instanceof function
 tester.ensureEquals(function() return type(1) end, "Ensure Type works on primitives.", "number")
@@ -159,12 +177,41 @@ tester.ensureEquals(function() return Animal:instanceof(Canid) end, "Ensure clas
 --tester.ensureEquals(function() return canid.readonly end, "Ensure reading readonly properties via __index works.", 5)
 tester.endTests()
 
-tester.startTests("Getters")
+--Test getters and setters - Need to test more.
+tester.startTests("Getters and Setters")
 
 tester.ensureEquals(function() return animal.getter end, "Ensure base class getter works.", 1)
 tester.ensureEquals(function() animal.setter = 5 return animal.setValue end, "Ensure base class setter works.", 5)
 tester.ensureEquals(function() return animal.getter end , "Ensure inherited class getter works.", 1)
 tester.ensureEquals(function() canid.setter = 5 return canid.setValue end, "Ensure inherited class setter works.", 5)
+tester.ensureEquals(function() return canid.getter2 end , "Ensure subclass getter works.", 3)
+tester.ensureEquals(function() canid.setter2 = 6 return canid.setValue2 end, "Ensure subclass setter works.", 6)
 
-print(Canid.new)
+tester.endTests()
+
+AbstractBaseClass = {
+    public_prop = 2,
+    _readonly_prop = 3,
+    __private_prop = 4,
+}
+
+AbstractBaseClass = class("AbstractBaseClass", AbstractBaseClass)
+
+function AbstractBaseClass:abstractMethod()
+    error("Not Implemented!")
+end
+
+function AbstractBaseClass:abstractMethod2()
+    error("Not Implemented!")
+end
+
+ConcreteClass = {
+    public_prop = 2
+}
+
+ConcreteClass = extend(AbstractBaseClass, "ConcreteClass", ConcreteClass)
+
+expect(1, "Animal", "class")
+
+
 

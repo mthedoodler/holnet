@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, duplicate-set-field, lowercase-global
 --Node = require("Node").Node
 
 local function copyTable(datatable)

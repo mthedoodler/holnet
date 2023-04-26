@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field, lowercase-global, duplicate-index
 Node = {
     attributes = {},
     baseURI = "",

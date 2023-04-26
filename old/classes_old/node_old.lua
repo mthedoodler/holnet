@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, duplicate-set-field, lowercase-global
 function deepcopy(orig)
     local orig_type = type(orig)
     local copy

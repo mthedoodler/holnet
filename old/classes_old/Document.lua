@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 Node = require("Node").Node
 
 DocumentType = {publicID = "", systemID = "", name=""}

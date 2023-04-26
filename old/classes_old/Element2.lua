@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global, duplicate-set-field
 Node = require("Node2").Node
 
 Element = Node:new()

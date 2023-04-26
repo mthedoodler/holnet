@@ -1,3 +1,4 @@
+---@diagnostic disable: missing-parameter, duplicate-set-field
 --Node 'Interface' according to DOM Level 1, implemented as an 'abstract' class
 
 Node = {}

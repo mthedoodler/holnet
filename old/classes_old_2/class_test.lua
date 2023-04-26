@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global
 classutils = require("classUtils")
 supportReadOnly = classutils.supportReadOnly
 supportReadOnlyInstance = classutils.supportReadOnlyInstance

@@ -32,7 +32,9 @@ local function type(obj)
         return currentType
     end
 
-    if obj.__type then
+    if rawget(obj, "__type") then
+        return "class"
+    elseif obj.__type then
         return obj.__type
     end
 
@@ -64,48 +66,73 @@ local function instanceof(obj, class)
     return instanceof(obj_mt, class)
 end
 
+--- Returns true if var is of the expectedType
+--- 
+--- @param obj any - The object to check.
+--- @param expectedType class|string - The type to check for; either a Class for a class or a string for a primitive/table.
+--- @return boolean - true if var is of type expectedType.
 
---- Adds support for classes to cc.expect's expect function. Only supports 1 valid type.
---- For non table Lua types, this just calls cc.expect's version.
---- For tables, it checks to see if it's a class or an instance.
+local function isType(obj, expectedType)
+    if type(expectedType) == "string" then -- check for built-in types
+        if expectedType == "class" then
+            return rawtype(obj) == "table" and rawget(obj, "__type") ~= nil
+        else
+            return type(obj) == expectedType
+        end
+    elseif rawtype(expectedType) == "table" then -- check for instances of classes
+        return not rawget(obj, "__type") and obj:instanceof(expectedType)
+    end
+    return false
+end
+
+--- Reimplemtation of cc.expect's expect function that supports classes.
 --- If value doesnt match expectedType, throws an error. Otherwise, returns value.
 --- 
 --- @param index number - The 1-based argument index.
 --- @param var any - The argument value.
---- @param expectedType string | class - The type to check against.
+--- @param expectedTypes string | class - The types to check against.
 --- @return var any - Returns the value itself.
 
-local function expectSingle(index, var, expectedType)
+local function expect(index, var, ...)
     rawexpect(1, index, "number")
-    rawexpect(3, expectedType, "string", "table")
 
-    if rawtype(expectedType) ~= "table" then --Are we testing for a default builtin or a class?
-        if rawtype(var) ~= "table" or (expectedType == "table" and type(var) == "table") then --Is the variable a table(and not an instance)?
-            return rawexpect(index, var, expectedType)
-        end
+    local expectedTypes = {...}
+    local var = var
 
-        --If testing for a class, return the variable if the metatable(parent) has a __type.
-        if expectedType == "class" and rawget(var, "__type") then
+    --Iterate through all the types in the expectedTypes table.
+    --If there's a match, return var. Otherwise, throw an error.
+
+    local expectedTypesString = "" --Error message.
+
+    for i, expectedType in ipairs(expectedTypes) do 
+        if isType(var, expectedType) then --If match, return var.
             return var
+        end
+        --Use each iteration of the loop to add on to the error message.
+        if i > 1 then
+            expectedTypesString = expectedTypesString .. ", "
+        end
+
+        if rawtype(expectedType) == "table" then --If a table/class/instance:
+            if type(expectedType) == "class" then --If class(appends 'instance of ' and the class's __type)
+                expectedTypesString = expectedTypesString .. "instance of " .. expectedType.__type
+            else --If instance(appends class __type) or table(appends 'table')
+                expectedTypesString = expectedTypesString .. type(expectedType)
+            end
         else
-            error("bad argument #"..index.." (expected "..expectedType .. ", got "..type(var) ..")")
+            expectedTypesString = expectedTypesString .. expectedType
         end
     end
-
-    --Otherwise, we're expecting a class/subtype of the class.
-    if var:instanceof(expectedType) then
-        return var
-    end
-
-    error("bad argument " .. index .. "(expected ".. expectedType.__type .. ", got ".. var.__type ..")")
+    --Throw the error
+    error("bad argument #"..index.." (expected "..expectedTypesString..", got "..type(var)..")", 2)
 end
 
 --- Check if the class cls implements all of its parent class's methods.
 
 --- @param cls class - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
 
-local function ensureImplementsAbstract(cls)
-    expectSingle(1, cls, "class")
+local function assertImplementsParent(cls)
+    expect(1, cls, "class")
     local parent = getmetatable(cls)
 
     for key, value in pairs(cls) do
@@ -189,16 +216,16 @@ end
 
 
 --- Extend a base class given the class table and its new name and vars.
-    
+
 --- @param super table - The superclass table. This will be the parent of cls.
 --- @param name string - The namme of the new subclass. This is stored in the cls.__type private property will be what type(cls) returns.
 --- @param vars table - The properties(instance variables) that the subclass stores, along with default values.
 --- @return class - The new subclass table.
 
 local function extend(super, name, vars) 
-    expectSingle(1, super, "class")
+    expect(1, super, "class")
     expect(2, name, "string")
-    expectSingle(3, vars, "table")
+    expect(3, vars, "table")
 
     --Create class and set metatable to the parent.
     local cls, clsReadOnlyVars, clsSetters = class(name, vars)
@@ -219,4 +246,4 @@ local function extend(super, name, vars)
 end
 
 
-return {type=type, expectSingle=expectSingle, rawtype=rawtype, instanceof=instanceof, class=class, extend=extend}
+return {type=type, expect=expect, rawtype=rawtype, instanceof=instanceof, class=class, extend=extend, assertImplementsParent=assertImplementsParent}
