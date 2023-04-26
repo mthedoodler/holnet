@@ -193,25 +193,94 @@ AbstractBaseClass = {
     public_prop = 2,
     _readonly_prop = 3,
     __private_prop = 4,
+    _ggetter = "",
 }
 
 AbstractBaseClass = class("AbstractBaseClass", AbstractBaseClass)
 
-function AbstractBaseClass:abstractMethod()
+function AbstractBaseClass:_aabstractMethod()
     error("Not Implemented!")
 end
 
-function AbstractBaseClass:abstractMethod2()
+function AbstractBaseClass:_aabstractMethod2()
     error("Not Implemented!")
+end
+
+
+function AbstractBaseClass:concreteMethod()
+    return 2
 end
 
 ConcreteClass = {
-    public_prop = 2
+    public_prop = 3
 }
 
 ConcreteClass = extend(AbstractBaseClass, "ConcreteClass", ConcreteClass)
 
-expect(1, "Animal", "class")
+tester.startTests("Test assertImplementsParent; which checks if the subclass implements all the methods of its superclass.")
+tester.ensureErrors(function() assertImplementsParent(animal) end, "Ensure errors when instance supplied.")
+tester.ensureErrors(function() assertImplementsParent(canid) end, "Ensure errors when subclass instance supplied.")
+
+tester.ensureErrors(function() assertImplementsParent(AbstractBaseClass) end, "Ensure error when supplied class has no parent.")
+tester.ensureErrors(function() assertImplementsParent(Animal) end, "Ensure error when supplied non-abstract class has no parent.")
+
+tester.ensureErrors(function() assertImplementsParent() end, "Ensure errors when non-instance table supplied.")
+
+tester.ensureErrors(function() assertImplementsParent(ConcreteClass) end, "Ensure errors when subclass doesnt implement parent class.")
+
+function ConcreteClass:abstractMethod2()
+    print("Hello!")
+end
+
+tester.ensureErrors(function() assertImplementsParent(ConcreteClass) end, "Ensure errors when subclass doesnt implement part of parent class.")
 
 
+function ConcreteClass:_aabstractMethod()
+    print("Hello!")
+end
 
+tester.ensureErrors(function() assertImplementsParent(ConcreteClass) end, "Ensure errors when subclass includes an abstract method is used to implement the parent's.")
+
+function ConcreteClass:abstractMethod()
+    print("Hello!")
+end
+
+tester.ensureErrors(function() assertImplementsParent(ConcreteClass) end, "Ensure errors when subclass doesnt implement getter.")
+
+function ConcreteClass:_ggetter()
+    return 0
+end
+
+tester.ensureRuns(function() assertImplementsParent(ConcreteClass) end, "Ensure passes when subclass fully implements parent class's methods")
+
+
+AbstractChildClass2 = extend(AbstractBaseClass, "AbstractChildClass2", {})
+
+function AbstractChildClass2:_ggetter()
+    return 0
+end
+
+function AbstractChildClass2:aabstractMethod()
+    print("Yo!")
+end
+
+function AbstractChildClass2:_aabstractMethod2()
+    error("Still Not Implemented!")
+end
+
+
+ChildOfAbstractClass2 = extend(AbstractChildClass2, "ChildOfAbstractClass2", {})
+
+
+tester.ensureErrors(function() assertImplementsParent(AbstractChildClass2) end, "Ensure errors when abstract class's parent is not implemented.")
+
+function AbstractChildClass2:_aabstractMethod3()
+    print("Yo!")
+end
+
+tester.ensureErrors(function() assertImplementsParent(ChildOfAbstractClass2) end, "Ensure errors when abstract class's parent is not implemented.")
+
+function ChildOfAbstractClass2:aabstractMethod3()
+    print("Yo!")
+end
+tester.endTests()

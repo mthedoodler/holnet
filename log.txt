@@ -146,16 +146,16 @@ Running Test 8: Ensure reading new readonly property via _ works.
 -->Expected: -6,  Recieved: -6
 -- [Test 8 Passed!] --
 Running Test 9: Ensure setting new read only property fails
-DOMutils/classutils.lua:239: Attempt to set read-only variable readonly3
+DOMutils/classutils.lua:226: Attempt to set read-only variable readonly3
 -- [Test 9 Passed!] --
 Running Test 10: Ensure setting inherited read only property fails
-DOMutils/classutils.lua:239: Attempt to set read-only variable readonly2
+DOMutils/classutils.lua:226: Attempt to set read-only variable readonly2
 -- [Test 10 Passed!] --
 Running Test 11: Ensure reading new private property fails.
 DOMutils/class_test_3.lua:144: Attempt to access private variable private3
 -- [Test 11 Passed!] --
 Running Test 12: Ensure reading inherited property fails.
-DOMutils/classutils.lua:194: Attempt to access private variable private2
+DOMutils/classutils.lua:181: Attempt to access private variable private2
 -- [Test 12 Passed!] --
 Running Test 13: Ensure reading new private property via _ works.
 -->Expected: "Fuck you",  Recieved: "Fuck you"
@@ -287,4 +287,57 @@ Test 5 Passed!
 Test 6 Passed!
 6 Passed, 0 Failed.
 **** END TEST: Getters and Setters****
+
+**** BEGIN TEST: Test assertImplementsParent; which checks if the subclass implements all the methods of its superclass.****
+Running Test 1: Ensure errors when instance supplied.
+DOMutils/classutils.lua:246: bad argument #1 (expected class, got Animal)
+-- [Test 1 Passed!] --
+Running Test 2: Ensure errors when subclass instance supplied.
+DOMutils/classutils.lua:246: bad argument #1 (expected class, got Canid)
+-- [Test 2 Passed!] --
+Running Test 3: Ensure error when supplied class has no parent.
+DOMutils/classutils.lua:250: class AbstractBaseClass has no parent.
+-- [Test 3 Passed!] --
+Running Test 4: Ensure error when supplied non-abstract class has no parent.
+DOMutils/classutils.lua:250: class Animal has no parent.
+-- [Test 4 Passed!] --
+Running Test 5: Ensure errors when non-instance table supplied.
+DOMutils/classutils.lua:246: bad argument #1 (expected class, got nil)
+-- [Test 5 Passed!] --
+Running Test 6: Ensure errors when subclass doesnt implement parent class.
+DOMutils/class_test_3.lua:229: class ConcreteClass doesn't implement method abstractMethod2 from parent class AbstractBaseClass.
+-- [Test 6 Passed!] --
+Running Test 7: Ensure errors when subclass doesnt implement part of parent class.
+DOMutils/class_test_3.lua:235: class ConcreteClass doesn't implement method abstractMethod from parent class AbstractBaseClass.
+-- [Test 7 Passed!] --
+Running Test 8: Ensure errors when subclass includes an abstract method is used to implement the parent's.
+DOMutils/class_test_3.lua:242: class ConcreteClass doesn't implement getter _ggetter from parent class AbstractBaseClass.
+-- [Test 8 Passed!] --
+Running Test 9: Ensure errors when subclass doesnt implement getter.
+DOMutils/class_test_3.lua:248: class ConcreteClass doesn't implement getter _ggetter from parent class AbstractBaseClass.
+-- [Test 9 Passed!] --
+Running Test 10: Ensure passes when subclass fully implements parent class's methods
+-- [Test 10 Passed!] --
+Running Test 11: Ensure errors when abstract class's parent is not implemented.
+DOMutils/class_test_3.lua:275: class AbstractChildClass2 doesn't implement method abstractMethod from parent class AbstractBaseClass.
+-- [Test 11 Passed!] --
+Running Test 12: Ensure errors when abstract class's parent is not implemented.
+DOMutils/class_test_3.lua:281: class ChildOfAbstractClass2 doesn't implement method abstractMethod3 from parent class AbstractChildClass2.
+-- [Test 12 Passed!] --
+**** TEST RESULTS: ****
+Tests 1-12 Concluded.
+Test 1 Passed!
+Test 2 Passed!
+Test 3 Passed!
+Test 4 Passed!
+Test 5 Passed!
+Test 6 Passed!
+Test 7 Passed!
+Test 8 Passed!
+Test 9 Passed!
+Test 10 Passed!
+Test 11 Passed!
+Test 12 Passed!
+12 Passed, 0 Failed.
+**** END TEST: Test assertImplementsParent; which checks if the subclass implements all the methods of its superclass.****
 

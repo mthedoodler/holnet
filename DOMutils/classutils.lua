@@ -127,21 +127,6 @@ local function expect(index, var, ...)
     error("bad argument #"..index.." (expected "..expectedTypesString..", got "..type(var)..")", 2)
 end
 
---- Check if the class cls implements all of its parent class's methods.
-
---- @param cls class - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
-
-local function assertImplementsParent(cls)
-    expect(1, cls, "class")
-    local parent = getmetatable(cls)
-
-    for key, value in pairs(cls) do
-        if rawtype(rawget(parent, key)) == "function" and rawtype(rawget(cls, key)) ~= "function" then
-            error("Method " .. key .. " from parent class not supported", 2)
-        end
-    end
-end
-
 --- Create a new base class given its name(type) and variables.
 
 --- @param name string - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
@@ -175,8 +160,10 @@ local function class(name, vars)
                 clsReadOnlyVars[key:sub(2,-1)] = true
                 if key:sub(2,2) == "g" then
                     clsGetters[key:sub(3,-1)] = true
+                    cls[key] = function() return nil end
                 elseif key:sub(2,2) == "s" then
                     clsSetters[key:sub(3,-1)] = true
+                    cls[key] = function() return nil end
                 end
             end
         end
@@ -243,6 +230,50 @@ local function extend(super, name, vars)
     end
     
     return cls
+end
+
+local abstractFunctionPrefixes = {
+    _a = true,
+    _g = true,
+    _s = true
+}
+
+--- Check if the class cls implements all of its parent class's abstract methods.
+
+--- @param cls class - The new 'type' of the class. This is stored in the cls.__type private property will be what type(cls) returns.
+local function assertImplementsParent(cls)
+    expect(1, cls, "class")
+    local parent = getmetatable(cls)
+
+    if not parent then
+        error("class " .. cls.__type .. " has no parent.")
+    end
+    for key, value in pairs(parent) do
+
+        if abstractFunctionPrefixes[key:sub(1, 2)] and rawtype(rawget(parent, key)) == "function" then
+            local abstractKey = key:gsub("_a", "") --The inclusion of the check here allows for _a abstract functions to still count as implementing - allowing for abstract classes to  extend abstract classes.
+
+            if rawtype(rawget(cls, abstractKey)) ~= "function" and rawtype(rawget(cls, key)) ~= "function" then
+                local methodType = ""
+
+                if key:sub(1,2) == "_g" then
+                    methodType = "getter"
+                elseif key:sub(1,2) == "_s" then
+                    methodType = "setter"
+                else
+                    methodType = "method"
+                end
+
+                local unimplementedParent = parent
+
+                while rawget(unimplementedParent, key) == nil do --Find the parent with the missing method
+                    unimplementedParent = getmetatable(unimplementedParent)
+                end
+
+                error("class " .. cls.__type .. " doesn't implement " .. methodType .. " " .. abstractKey .. " from parent class " .. unimplementedParent.__type .. ".",  2)
+            end
+        end
+    end
 end
 
 
