@@ -1,5 +1,6 @@
 local classutils = require("classutils")
 local tableutils = require("tableutils")
+local pretty = require("cc.pretty")
 Document = {}
 Element = {}
 
@@ -26,6 +27,8 @@ local Node = {
    _ownerDocument = {},
    _parentNode = {},
    textContent = "", 
+
+   children = {}, --For testing, will remove later
    
    _ELEMENT_NODE = 1,
    _ATTRIBUTE_NODE = 2,
@@ -105,7 +108,7 @@ function Node:getRootNode(options)
 end
 
 function Node:_ahasChildNodes()
-    error("Not Implemented Yet! Dependent on Children!")
+    return #self.childNodes > 0
 end
 
 function Node:_ainsertBefore(node)
@@ -143,6 +146,45 @@ end
 function Node:tostring()
     return "Node object"
 end
+
+function Node:_gchildNodes()
+    local tbl = {}
+    pretty.pretty_print(self.children)
+    for _, child in pairs(self.children) do
+        term.setTextColor(colors.red)
+        pretty.pretty_print(self.children)
+        term.setTextColor(colors.white)
+        table.insert(tbl, child)
+        for _, grandchild in pairs(child.childNodes) do
+            term.setTextColor(colors.green)
+        pretty.pretty_print(self.children)
+        term.setTextColor(colors.white)
+            table.insert(tbl, grandchild)
+        end
+    end
+
+    return tbl
+end
+
+
+local function manualNodeConstructor() 
+    local o = {}
+    o.children = {}
+    setmetatable(o, Node)
+    return o
+end
+
+local x = manualNodeConstructor()
+local y = manualNodeConstructor()
+local z = manualNodeConstructor()
+
+
+x.children[1] =  y
+x.children[2] = z
+
+x.children[2].children[1] = manualNodeConstructor()
+
+pretty.pretty_print(x.childNodes)
 
 return Node
 
