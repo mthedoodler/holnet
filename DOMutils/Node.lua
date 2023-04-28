@@ -1,4 +1,8 @@
 local classutils = require("classutils")
+local tableutils = require("tableutils")
+Document = {}
+Element = {}
+
 
 local type = classutils.type
 local instanceof = classutils.instanceof
@@ -13,16 +17,16 @@ local Node = {
    _gfirstChild = {},
    _gisConnected = false,
    _glastChild = {},
-   _nextSibling = {},
+   _gparentElement = {},
+   _gnextSibling = {},
+   _gpreviousSibling = {},
    _nodeName = "",
    _nodeType = -1,
    nodeValue = 0,
-   _ownerDocument = 0,
+   _ownerDocument = {},
    _parentNode = {},
-   _parentElement = {},
-   _previousSibling = {},
    textContent = "", 
-
+   
    _ELEMENT_NODE = 1,
    _ATTRIBUTE_NODE = 2,
    _TEXT_NODE = 3,
@@ -37,69 +41,106 @@ local Node = {
    _NOTATION_NODE = 12,
 }
 
+local x = {67,26,63,34,15}
+print(indexOf(x, 63))
+
+
 Node = class("Node", Node)
 
-local function Node:_aappendChild(node)
-    error("Not Implemented!")
+function Node:_gisConnected() 
+    return self:getRootNode():instanceof(Document)
 end
 
-local function Node:_acloneNode(other)
-    error("Not Implemented!")
-end
-
-local function Node:compareDocumentPosition(other)
-    error("Not currently implemented yet!")
-end
-
-local function Node:_acontains(other)
-    error("Not Implemented")
-end
-
-local function Node:getRootNode()
-    if self._parentNode then
-        return self._parentNode:getRootNode()
-    else
-        return self
+function Node:_gparentElement()
+    if self._parentNode:instanceOf(Element) then
+        return self._parentNode 
     end
 end
 
-local function Node:_ahasChildNodes()
+function Node:_gfirstChild()
+    return self.childNodes[1]
+end
+
+function Node:_glastChild()
+    return self.childNodes[#self.childNodes]
+end
+
+function Node:_gpreviousSibling()
+    local nodeIndex = indexOf(self._parentNode.childNodes, self)
+    if nodeIndex > 1 then
+        return self._parentNode.childNodes[nodeIndex - 1]
+    end
+end
+
+function Node:_gnextChild()
+    local nodeIndex = indexOf(self._parentNode.childNodes, self)
+    if nodeIndex < #(self._parentNode.childNodes) then
+        return self._parentNode.childNodes[nodeIndex + 1]
+    end
+end
+
+function Node:_aappendChild(node)
+    error("Not Implemented; Node Specific. Children depends on Node types.")
+end
+
+function Node:_acloneNode(deep)
+    error("Not Implemented; Node Specific. Requires cloning children, which is dependent on subclasses.")
+end
+
+function Node:_acompareDocumentPosition(other)
+    error("Will implement later!")
+end
+
+function Node:contains(other)
+    return other == self or contains(self.childNodes, other)
+end
+
+function Node:getRootNode(options)
+    if self._parentNode then
+        if type(self._parentNode) ~= "ShadowRoot" or options.composed then
+            return self._parentNode:getRootNode()
+        end
+    end
+    return self
+end
+
+function Node:_ahasChildNodes()
+    error("Not Implemented Yet! Dependent on Children!")
+end
+
+function Node:_ainsertBefore(node)
     error("Not Implemented!")
 end
 
-local function Node:_ainsertBefore(node)
-    error("Not Implemented!")
-end
-
-local function Node:isDefaultNamespace(uri)
+function Node:isDefaultNamespace(uri)
     error("Not currently implemented yet!")
 end
 
-local function Node:isEqualNode(other)
+function Node:isEqualNode(other)
     error("Not currently implemented yet!")
 end
 
-local function Node:isSameNode(other)
+function Node:isSameNode(other)
     return self == other
 end
 
-local function Node:lookupNamespaceURI(prefix)
+function Node:lookupNamespaceURI(prefix)
     error("Not currently implemented yet!")
 end
 
-local function Node:_anormalize()
-    error("Not Implemented!")
+function Node:_anormalize()
+    error("Not Implemented yet! ")
 end
 
-local function Node:_aremoveChild(child)
-    error("Not Implemented!")
+function Node:_aremoveChild(child)
+    error("Not Implemented! Dependent on children!")
 end
 
-local function Node:_areplaceChild(child)
-    error("Not Implemented!")
+function Node:_areplaceChild(child)
+    error("Not Implemented! Dependent on children!")
 end
 
-local function Node:tostring()
+function Node:tostring()
     return "Node object"
 end
 
