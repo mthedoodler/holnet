@@ -12,7 +12,7 @@ local expect = classutils.expect
 local assertImplementsParent = classutils.assertImplementsParent
 
 
---- **** Node ****
+--- **** Node[Abstract] ****
 --- [x] baseURI - readonly string
 --- [x] childNodes - private readonlytable
 --- [x] firstChild - getter Node
