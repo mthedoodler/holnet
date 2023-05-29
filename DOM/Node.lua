@@ -73,7 +73,6 @@ local Node = {
 
     _gchildNodes = {},
 
-    _parentNode = {},
     _gparentElement = {},
 
     _gfirstChild = {},
@@ -279,11 +278,11 @@ function Node:isSameNode(o)
 end
 
 function Node:_acompareDocumentPosition(other)
-    if this == other then return 0 end
+    if self == other then return 0 end
 
     local node1 = other
     local node2 = self
-
+    local attr1, attr2
     if type(node1) == "Attr" then 
         attr1 = node1
         node1 = attr1.ownerElement
@@ -346,7 +345,7 @@ function Node:normalize()
             local data = ""
             while true do
                 i = i + 1
-                local newNode = allChildren[j]
+                local newNode = allChildren[i]
                 if type(newNode) == "Text" then
                     data = data .. newNode.wholeText
                     table.insert(toRemove,newNode)

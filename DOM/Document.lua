@@ -24,6 +24,3 @@ Document = {
 }
 
 Document = extend(Node, "Document", Document)
-
-function Document:new(options)
-

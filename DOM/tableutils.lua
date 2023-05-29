@@ -30,6 +30,21 @@ function shallowclone(tbl)
     return out
 end
 
+function shallowequals(x, y)
+    for k, v in pairs(x) do
+        if y[k] ~= v then
+            return false
+        end
+    end
+
+    for k, v in pairs(y) do
+        if x[k] ~= v then
+            return false
+        end
+    end
+
+    return true
+end
 
 function makeReadOnlyProxy(t)
     expect(1, t, "table")
@@ -46,3 +61,11 @@ function makeReadOnlyProxy(t)
     setmetatable(proxy, mt)
     return proxy
 end  
+
+print(shallowequals({"a","b"},{"a","b"}))
+print(shallowequals({b="a",a="b"},{b="a",a="b"}))
+
+print(shallowequals({b="a",a="b"},{b="a",a="c"}))
+
+print(shallowequals({b="a",a="b"},{b="a",a="b", c="3"}))
+

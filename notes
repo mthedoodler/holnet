@@ -1,0 +1,12 @@
+-Clocks must be implemented
+-Arrays start at 1, not 0
+-Unicode whitespace is not CC whitespace
+-CSS parsing has been skipped for now.
+-The class system must be improved upon.
+-ServiceWorkerGlobalScope's addEventListener method must warn the console; details are in EventTarget's addEventListener algorithim.
+-AbortSignal is aborted if self.reason is defined.
+-AbortSignal's algorithims is an orderedSet called __algorithims(needed for EventTarget's addEventListener and other tings that need to add to this)
+-Sequences are passed by value i.e. copied.
+-ShadowRoots(possible DocumentFragments themselves) are called ShadowRoot.host.
+-Events activation behaviour is defined by a private __activationBehaviour method.
+-Slottable's slot is gotten by .slot. Text nodes will need alternate behaviour(this affects dispatchEvent)

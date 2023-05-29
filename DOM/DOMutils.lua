@@ -123,6 +123,35 @@ local function validateQName(qualifiedName)
     error("InvalidCharacterError: DOMException", 3)
 end
 
+local function descendants(node)
+    local tbl = {}
+    pretty.pretty_print(node)
+    for _, child in ipairs(node.__children) do
+        table.insert(tbl, child)
+        for _, grandchild in pairs(descendants(child)) do
+            table.insert(tbl, grandchild)
+        end
+    end
+
+    return tbl
+end
+
+local function isDescendant(node, descendant, isShadow)
+    if type(node) == "nil" then return false end
+
+    if isShadow then
+        local root = node:getRootNode()
+        if type(root) == "ShadowRoot" and isDescendant(root.host, descendant, isShadow) then return true end
+    end
+    for _, child in ipairs(node.__children) do
+        if child == node or isDescendant(child, descendant, isShadow) then return true end
+    end
+
+    
+
+    return false
+end
+
 validateQName("Hello:BITCH")
 --validateQName("H/ello:BITCH")
 --validateQName("123:vsa")
@@ -164,6 +193,11 @@ local function validateAndExtractQName(namespace, qualifiedName)
     return namespace, prefix, localName
 end
 
+local start = os.clock()
+
+local function relativeHighResolutionCoarseTime(coarseTime)
+    return math.abs(start - (coarseTime or 0))
+end
 
 
 pretty.pretty_print(splitOnWhitespace("123\t456\n789"))
@@ -174,4 +208,4 @@ print(validateAndExtractQName("http://www.w3.org/XML/1998/namespace", "xml:iwond
 --print(validateAndExtractQName("a", "xml:iwonder2"))
 --print(validateAndExtractQName("potato", "a233:iwonder2"))
 
-return orderedSetParser
+return {orderedSetParser=orderedSetParser, relativeHighResolutionCoarseTime=relativeHighResolutionCoarseTime, descendants=descendants, isDescendant=isDescendant}

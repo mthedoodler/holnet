@@ -34,7 +34,9 @@ local function type(obj)
 
     if rawget(obj, "__type") then
         return "class"
-    elseif getmetatable(obj).__type then
+    end
+    local mt = getmetatable(obj)
+    if mt and mt.__type then
         return obj.__type
     end
 
@@ -105,6 +107,7 @@ local function expect(index, var, ...)
     local expectedTypesString = "" --Error message.
 
     for i, expectedType in ipairs(expectedTypes) do 
+        print(expectedType)
         if isType(var, expectedType) then --If match, return var.
             return var
         end
@@ -171,10 +174,10 @@ local function class(name, vars)
 
     -- Make `__newindex` and `__index` functions that enforce read-only and private variables.
     function cls.__index(tbl, key)
-        if clsPrivateVars[key] then
-            error("Attempt to access private variable " .. key, 2)
-        elseif clsReadOnlyVars[key] then
+        if clsReadOnlyVars[key] then
             return tbl["_" .. key]
+        elseif clsPrivateVars[key] then
+            error("Attempt to access private variable " .. key, 2)
         elseif clsGetters[key] then
             return cls["_g" .. key](tbl)
         else

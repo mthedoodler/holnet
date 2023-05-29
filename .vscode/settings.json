@@ -4,7 +4,8 @@
         "textutils",
         "term",
         "colors",
-        "fs"
+        "fs",
+        "b"
     ],
     "Lua.diagnostics.disable": [
         "undefined-doc-param"

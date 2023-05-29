@@ -224,7 +224,7 @@ tester.ensureErrors(function() assertImplementsParent(canid) end, "Ensure errors
 tester.ensureErrors(function() assertImplementsParent(AbstractBaseClass) end, "Ensure error when supplied class has no parent.")
 tester.ensureErrors(function() assertImplementsParent(Animal) end, "Ensure error when supplied non-abstract class has no parent.")
 
-tester.ensureErrors(function() assertImplementsParent() end, "Ensure errors when non-instance table supplied.")
+tester.ensureErrors(function() assertImplementsParent({}) end, "Ensure errors when non-instance table supplied.")
 
 tester.ensureErrors(function() assertImplementsParent(ConcreteClass) end, "Ensure errors when subclass doesnt implement parent class.")
 
